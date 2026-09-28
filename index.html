@@ -64,7 +64,6 @@ select{display:block;margin-top:7px;padding:8px 30px 8px 10px;background:#fff;bo
 .kpi.c-attr .k-val{color:var(--attr)}
 .kpi.c-acq .k-val{color:var(--acq)}
 .kpi.c-rich .k-val{color:var(--rich)}
-/* 定住人口＝ブルー系(--attr) / 非定住人口＝グリーン系(--acq) に統一 */
 .kpi .k-cap{font-size:11px;color:var(--dim)}
 
 h3.card-title{font-size:14.5px;font-weight:800;margin:0 0 4px;color:var(--text)}
@@ -87,11 +86,6 @@ p.card-sub{font-size:11.5px;color:var(--dim);margin:0 0 16px}
 .legend-top i{width:9px;height:9px;display:inline-block;margin-right:6px}
 .legend-top .li1 i{background:var(--attr)}
 .legend-top .li2 i{background:var(--acq)}
-
-.message{border-top:2px solid rgba(122,88,176,.55)}
-.message strong{font-size:15px}
-.insights{margin:12px 0 0;padding-left:20px}
-.insights li{margin:8px 0;line-height:1.6;font-size:13px;color:var(--text)}
 
 .error{display:none;color:#b42318;background:#fff;padding:14px 18px;border-top:2px solid #b42318;margin-bottom:16px;font-size:13px}
 .empty-note{font-size:12px;color:var(--dim);padding:6px 0}
@@ -151,7 +145,7 @@ footer code{color:var(--muted)}
 .map-legend .dot.resident{background:var(--attr)}
 .map-legend .dot.visitor{background:var(--acq)}
 .map-box{width:100%;height:380px;background:#e8ebef}
-.map-box.tall{height:560px}
+.map-box.tall{height:520px}
 .leaflet-popup-content{font-family:var(--font);font-size:12.5px;line-height:1.6}
 .leaflet-popup-content b{color:var(--text)}
 .popup-seg{display:inline-block;font-size:10.5px;font-weight:800;padding:1px 8px;margin-top:4px}
@@ -168,17 +162,18 @@ footer code{color:var(--muted)}
 .split-col-head.visitor .sc-title{color:var(--acq)}
 .split-col-head .sc-count{font-size:11.5px;color:var(--muted)}
 
-.post-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.post-card{background:#fff;border:1px solid var(--stroke);display:flex;flex-direction:column;overflow:hidden;border-top:3px solid transparent}
+/* DROP post tiles: fixed size grid so left/right columns stay perfectly aligned */
+.post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+.post-card{background:#fff;border:1px solid var(--stroke);border-top:3px solid transparent;display:flex;flex-direction:column;overflow:hidden;height:300px}
 .post-card.resident{border-top-color:var(--attr)}
 .post-card.visitor{border-top-color:var(--acq)}
-.post-card .thumb{width:100%;aspect-ratio:4/3;object-fit:cover;background:#e8ebef;display:block}
-.post-card .body{padding:12px 14px 14px}
-.post-card .score-badge{display:inline-block;color:#fff;font-size:12px;font-weight:800;padding:3px 10px;margin-bottom:8px}
+.post-card .thumb{width:100%;height:120px;object-fit:cover;background:#e8ebef;display:block;flex:0 0 120px}
+.post-card .body{padding:10px 12px 12px;display:flex;flex-direction:column;flex:1;min-height:0}
+.post-card .score-badge{display:inline-block;color:#fff;font-size:11.5px;font-weight:800;padding:3px 9px;margin-bottom:7px;flex:0 0 auto;width:fit-content}
 .post-card.resident .score-badge{background:var(--attr)}
 .post-card.visitor .score-badge{background:var(--acq)}
-.post-card .sentence{font-size:12.5px;color:var(--text);line-height:1.55;margin:0 0 10px;max-height:5.4em;overflow:hidden}
-.post-card .meta{font-size:11px;color:var(--dim)}
+.post-card .sentence{font-size:12px;color:var(--text);line-height:1.5;margin:0;flex:1;min-height:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
+.post-card .meta{font-size:10.5px;color:var(--dim);margin-top:8px;flex:0 0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* STAMP viewer bubble markers */
 .stamp-bubble{display:flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:800;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px rgba(255,255,255,.85);opacity:.88}
@@ -190,7 +185,22 @@ footer code{color:var(--muted)}
 .stamp-legend-panel .sl-dot.resident{background:var(--attr)}
 .stamp-legend-panel .sl-dot.visitor{background:var(--acq)}
 
-@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cross{grid-template-columns:1fr}.sig-row{grid-template-columns:26px 140px 1fr 96px;gap:10px}}
+/* STAMP spot ranking (below map, resident=left / visitor=right) */
+.rank-list{display:flex;flex-direction:column}
+.rank-row{display:grid;grid-template-columns:24px 1fr 76px;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--stroke)}
+.rank-row:last-child{border-bottom:0}
+.rank-row .rank-num{font-size:12.5px;font-weight:800;color:var(--dim);text-align:center}
+.rank-row .rank-body{min-width:0;display:flex;flex-direction:column;gap:5px}
+.rank-row .rank-name{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-row .rank-track{height:9px;background:#eef0f3}
+.rank-row .rank-fill{height:100%}
+.rank-row.resident .rank-fill{background:var(--attr)}
+.rank-row.visitor .rank-fill{background:var(--acq)}
+.rank-row .rank-val{font-size:13px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+.rank-row.resident .rank-val{color:var(--attr)}
+.rank-row.visitor .rank-val{color:var(--acq)}
+
+@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cross{grid-template-columns:1fr}.sig-row{grid-template-columns:26px 140px 1fr 96px;gap:10px}.post-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:900px){.split-cols{grid-template-columns:1fr}}
 @media (max-width:760px){
   .app{grid-template-columns:1fr} .sidebar{display:none}
@@ -201,10 +211,12 @@ footer code{color:var(--muted)}
   .srank{display:none}
   .sdiff{text-align:left}
   .map-box{height:300px} .map-box.tall{height:380px}
+  .post-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:430px){
   .kpis{grid-template-columns:1fr 1fr;gap:10px} .card{padding:14px} .kpi .k-val{font-size:23px}
   .xbar-line{grid-template-columns:48px 1fr 62px}
+  .post-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -292,16 +304,6 @@ footer code{color:var(--muted)}
           <div id="score_compare" class="score-list"></div>
         </div>
       </section>
-
-      <div class="section-label"><h2>Strategy<span class="note">関係人口創出に向けた示唆</span></h2></div>
-      <section class="card message">
-        <strong>戦略メッセージ</strong>
-        <ul class="insights">
-          <li>イベント施策の主対象は、周遊密度と肯定的評価が高い定住人口。</li>
-          <li>非定住人口には「観光・まち歩き」「歴史・文化・景観」など、既存の観光資産を軸に訴求。</li>
-          <li>次段階では「富山とのゆかり」「職種・専門スキル」「再訪」を取得し、関係人口候補を識別。</li>
-        </ul>
-      </section>
     </section>
 
     <!-- ===================== DROP VIEWER VIEW ===================== -->
@@ -369,6 +371,22 @@ footer code{color:var(--muted)}
           <span class="sl-item"><i class="sl-dot resident"></i>円の大きさ＝スポットごとのスタンプ件数（定住人口）</span>
           <span class="sl-item"><i class="sl-dot visitor"></i>円の大きさ＝スポットごとのスタンプ件数（非定住人口）</span>
           <span class="sl-item">円中央の数字＝件数。クリックでスポット名を表示</span>
+        </div>
+      </div>
+
+      <div class="section-label"><h2>Spot Ranking<span class="note">スタンプ獲得件数の多いスポット（定住＝左／非定住＝右）</span></h2></div>
+      <div class="split-cols">
+        <div>
+          <div class="split-col-head resident"><span class="sc-title">定住人口</span><span class="sc-count" id="stampResCount"></span></div>
+          <div class="card">
+            <div id="stamp-rank-resident" class="rank-list"></div>
+          </div>
+        </div>
+        <div>
+          <div class="split-col-head visitor"><span class="sc-title">非定住人口</span><span class="sc-count" id="stampVisCount"></span></div>
+          <div class="card">
+            <div id="stamp-rank-visitor" class="rank-list"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -575,7 +593,7 @@ function postCardHtml(p, key, segClass){
   const img = p.image_file_path_thumbnail || p.image_file_path || '';
   const sentence = (p.sentence || '').replace(/</g,'&lt;');
   return `<div class="post-card ${segClass}">
-    <img class="thumb" loading="lazy" src="${img}" onerror="this.style.display='none'">
+    <img class="thumb" loading="lazy" src="${img}" onerror="this.onerror=null;this.style.visibility='hidden'">
     <div class="body">
       <span class="score-badge">${key.replace('Index_','')} ${score}</span>
       <p class="sentence">${sentence}</p>
@@ -648,8 +666,24 @@ function renderDropViewer(){
   updateDropMap(residentShown, visitorShown, key);
 }
 
-/* ===================== STAMP Viewer (bubble map) ===================== */
+/* ===================== STAMP Viewer (bubble map + spot ranking) ===================== */
 let stampMap=null, stampLayerResident=null, stampLayerVisitor=null, stampInitialized=false;
+let STAMP_AGG=null; // cached aggregation: array of {eid, seg, lat, lng, name, count}
+
+function aggregateStamps(){
+  if(STAMP_AGG) return STAMP_AGG;
+  const agg = new Map();
+  RAW.stamp.forEach(r=>{
+    const eid = r.event_id, seg = r.residence_segment;
+    const lat = r.spot_latitude, lng = r.spot_longitude;
+    if(!eid || !seg || !lat || !lng) return;
+    const key = eid+'__'+seg;
+    if(!agg.has(key)) agg.set(key, {eid, seg, lat, lng, name:r.event_name, count:0});
+    agg.get(key).count += 1;
+  });
+  STAMP_AGG = [...agg.values()];
+  return STAMP_AGG;
+}
 
 function initStampMap(){
   if(stampMap) return;
@@ -666,18 +700,7 @@ function renderStampMap(){
   if(stampInitialized) return;
   stampInitialized = true;
 
-  // 集計: (event_id, residence_segment) 単位でスタンプ件数を集計
-  const agg = new Map();
-  RAW.stamp.forEach(r=>{
-    const eid = r.event_id, seg = r.residence_segment;
-    const lat = r.spot_latitude, lng = r.spot_longitude;
-    if(!eid || !seg || !lat || !lng) return;
-    const key = eid+'__'+seg;
-    if(!agg.has(key)) agg.set(key, {eid, seg, lat, lng, name:r.event_name, count:0});
-    agg.get(key).count += 1;
-  });
-
-  const items = [...agg.values()];
+  const items = aggregateStamps();
   const maxCount = Math.max(1, ...items.map(i=>i.count));
   const sizeFor = c => Math.round(24 + Math.sqrt(c/maxCount)*40); // 24〜64px
 
@@ -709,6 +732,37 @@ function renderStampMap(){
     '定住人口': stampLayerResident,
     '非定住人口': stampLayerVisitor
   }, {collapsed:false, position:'topright'}).addTo(stampMap);
+
+  renderStampRanking();
+}
+
+function renderStampRanking(){
+  const items = aggregateStamps();
+  const residentItems = items.filter(i=>i.seg==='定住人口').sort((a,b)=>b.count-a.count);
+  const visitorItems = items.filter(i=>i.seg==='非定住人口').sort((a,b)=>b.count-a.count);
+
+  el('stampResCount').textContent = `${residentItems.length}スポット`;
+  el('stampVisCount').textContent = `${visitorItems.length}スポット`;
+
+  const buildList = (items, cls) => {
+    if(!items.length) return '<div class="empty-note">データがありません</div>';
+    const maxCount = Math.max(1, ...items.map(i=>i.count));
+    return items.map((it,i)=>{
+      const pct = Math.max(3, it.count/maxCount*100);
+      const name = (it.name||'不明なスポット').replace(/\r?\n/g,' ').replace(/</g,'&lt;');
+      return `<div class="rank-row ${cls}">
+        <div class="rank-num">${i+1}</div>
+        <div class="rank-body">
+          <span class="rank-name" title="${name}">${name}</span>
+          <div class="rank-track"><div class="rank-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="rank-val">${it.count}件</div>
+      </div>`;
+    }).join('');
+  };
+
+  el('stamp-rank-resident').innerHTML = buildList(residentItems, 'resident');
+  el('stamp-rank-visitor').innerHTML = buildList(visitorItems, 'visitor');
 }
 
 /* ===================== Nav switching ===================== */
