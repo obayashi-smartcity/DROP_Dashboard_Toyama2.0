@@ -24,12 +24,14 @@ html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-f
 .brand span{color:var(--gray)}
 .brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:1.5px;margin-top:6px;font-weight:700}
 .cap{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin:30px 10px 8px}
-.navi{display:flex;align-items:center;gap:10px;padding:9px 12px;border-left:2px solid transparent;color:var(--muted);font-size:13px;font-weight:500}
+.navi{display:flex;align-items:center;gap:10px;padding:9px 12px;border-left:2px solid transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer}
 .navi.active{border-left-color:var(--gray);font-weight:700;color:var(--text)}
 .side-foot{margin-top:auto;font-size:11px;color:var(--dim);line-height:1.6}
 
 /* main */
 main{padding:24px 28px 48px;min-width:0}
+.view{display:none}
+.view.active{display:block}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
 .topbar h1{font-size:36px;font-weight:900;margin:0;letter-spacing:-.7px}
 .topbar p{font-size:12.5px;color:var(--muted);margin:7px 0 0}
@@ -95,12 +97,38 @@ p.card-sub{font-size:11.5px;color:var(--dim);margin:0 0 16px}
 footer{padding:26px 28px 30px;margin-left:var(--sidebar-w);color:var(--dim);font-size:11px;text-align:center;line-height:1.7}
 footer code{color:var(--muted)}
 
-@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cross{grid-template-columns:1fr}}
+/* Score bars (horizontal double bar per index) */
+.score-list{display:flex;flex-direction:column;gap:0}
+.score-row{display:grid;grid-template-columns:150px 1fr 1fr;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--stroke)}
+.score-row:last-child{border-bottom:0}
+.score-row .sname{font-size:12.5px;font-weight:700;color:var(--text)}
+.score-side{display:flex;align-items:center;gap:8px}
+.score-side .strack{flex:1;height:10px;background:#eef0f3;position:relative}
+.score-side .sfill{height:100%}
+.score-side.resident .sfill{background:var(--attr)}
+.score-side.visitor .sfill{background:var(--rich)}
+.score-side .sval{font-size:11px;color:var(--muted);width:38px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* DROP viewer */
+.viewer-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+.post-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.post-card{background:#fff;border:1px solid var(--stroke);display:flex;flex-direction:column;overflow:hidden}
+.post-card .thumb{width:100%;aspect-ratio:4/3;object-fit:cover;background:#e8ebef;display:block}
+.post-card .body{padding:12px 14px 14px}
+.post-card .score-badge{display:inline-block;background:var(--rich);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;margin-bottom:8px}
+.post-card .sentence{font-size:12.5px;color:var(--text);line-height:1.55;margin:0 0 10px;max-height:5.4em;overflow:hidden}
+.post-card .meta{font-size:11px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.post-card .seg-tag{font-size:10.5px;font-weight:700;padding:1px 8px;display:inline-block}
+.post-card .seg-tag.resident{background:var(--attr-soft);color:var(--attr)}
+.post-card .seg-tag.visitor{background:var(--rich-soft);color:var(--rich)}
+
+@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cross{grid-template-columns:1fr}.score-row{grid-template-columns:120px 1fr 1fr}}
 @media (max-width:760px){
   .app{grid-template-columns:1fr} .sidebar{display:none}
   main{padding:16px 14px 40px} footer{margin-left:0;padding:20px 14px 26px}
   .topbar h1{font-size:29px} .section-label h2{font-size:22px}
   .filters{flex-direction:column;align-items:stretch} .filters .hint{margin-left:0}
+  .score-row{grid-template-columns:1fr;gap:6px}
 }
 @media (max-width:430px){
   .kpis{grid-template-columns:1fr 1fr;gap:10px} .card{padding:14px} .kpi .k-val{font-size:23px}
@@ -113,83 +141,137 @@ footer code{color:var(--muted)}
   <aside class="sidebar">
     <div class="brand">TOYAMA<span>.</span><small>EVENT INSIGHT</small></div>
     <div class="cap">Dashboard</div>
-    <span class="navi active">Summary</span>
+    <span class="navi active" data-view="summary">Summary</span>
+    <span class="navi" data-view="viewer">DROP ビューワー</span>
     <div class="side-foot">富山まちなかイベント<br>参加者行動データ分析</div>
   </aside>
   <main>
-    <div class="topbar">
-      <div><h1>Event Insight</h1><p>富山まちなかイベントの参加者行動と関係人口創出の分析</p></div>
-      <div class="status"><span class="pulse"></span>JSON DATA CONNECTED</div>
-    </div>
 
-    <div id="error" class="error"></div>
+    <!-- ===================== SUMMARY VIEW ===================== -->
+    <section id="view-summary" class="view active">
+      <div class="topbar">
+        <div><h1>Event Insight</h1><p>富山まちなかイベントの参加者行動と関係人口創出の分析</p></div>
+        <div class="status"><span class="pulse"></span>JSON DATA CONNECTED</div>
+      </div>
 
-    <div class="filters">
-      <label>データ
-        <select id="dataset">
-          <option value="all">STAMP + DROP</option>
-          <option value="stamp">STAMP（スタンプラリー）</option>
-          <option value="drop">DROP（フォト投稿）</option>
-        </select>
-      </label>
-      <span class="hint">属性クロス集計は account_id ベースのユニーク参加者数で算出（定住人口 / 非定住人口）</span>
-    </div>
+      <div id="error" class="error"></div>
 
-    <div class="section-label"><h2>KPI<span class="note">ユニーク参加者数（account_id基準）</span></h2></div>
-    <section class="grid kpis">
-      <div class="card kpi"><span class="k-label">総ユニーク参加者数</span><b class="k-val" id="k_total">-</b><span class="k-cap">account_id 重複排除</span></div>
-      <div class="card kpi c-attr"><span class="k-label">定住人口</span><b class="k-val" id="k_resident">-</b><span class="k-cap" id="k_resident_pct">-</span></div>
-      <div class="card kpi c-rich"><span class="k-label">非定住人口</span><b class="k-val" id="k_visitor">-</b><span class="k-cap" id="k_visitor_pct">-</span></div>
-      <div class="card kpi c-acq"><span class="k-label">まちなか肯定的評価率</span><b class="k-val" id="k_positive">-</b><span class="k-cap">とても＋やや感じている</span></div>
+      <div class="filters">
+        <label>データ
+          <select id="dataset">
+            <option value="all">STAMP + DROP</option>
+            <option value="stamp">STAMP（スタンプラリー）</option>
+            <option value="drop">DROP（フォト投稿）</option>
+          </select>
+        </label>
+        <span class="hint">属性クロス集計は account_id ベースのユニーク参加者数で算出（定住人口 / 非定住人口）</span>
+      </div>
+
+      <div class="section-label"><h2>KPI<span class="note">ユニーク参加者数（account_id基準）</span></h2></div>
+      <section class="grid kpis">
+        <div class="card kpi"><span class="k-label">総ユニーク参加者数</span><b class="k-val" id="k_total">-</b><span class="k-cap">account_id 重複排除</span></div>
+        <div class="card kpi c-attr"><span class="k-label">定住人口</span><b class="k-val" id="k_resident">-</b><span class="k-cap" id="k_resident_pct">-</span></div>
+        <div class="card kpi c-rich"><span class="k-label">非定住人口</span><b class="k-val" id="k_visitor">-</b><span class="k-cap" id="k_visitor_pct">-</span></div>
+        <div class="card kpi c-acq"><span class="k-label">まちなか肯定的評価率</span><b class="k-val" id="k_positive">-</b><span class="k-cap">とても＋やや感じている</span></div>
+      </section>
+
+      <div class="section-label"><h2>Cross Tab<span class="note">属性 × 定住／非定住</span></h2></div>
+      <section class="grid cross">
+        <div class="card">
+          <h3 class="card-title">年齢層</h3><p class="card-sub">age_group（ユニーク参加者）</p>
+          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <div id="x_age"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">性別</h3><p class="card-sub">gender（ユニーク参加者）</p>
+          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <div id="x_gender"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">居住地</h3><p class="card-sub">questionnaire_q1（ユニーク参加者）</p>
+          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <div id="x_residence"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">来訪目的</h3><p class="card-sub">questionnaire_q2（ユニーク参加者）</p>
+          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <div id="x_purpose"></div>
+        </div>
+        <div class="card full">
+          <h3 class="card-title">体験ニーズ</h3><p class="card-sub">questionnaire_q3（複数選択・ユニーク参加者。合計は参加者数を超える場合あり）</p>
+          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <div id="x_needs"></div>
+        </div>
+      </section>
+
+      <div class="section-label"><h2>Wellbeing Score<span class="note">DROP投稿スコア（20指標）× 定住／非定住　平均値比較</span></h2></div>
+      <section class="grid">
+        <div class="card full">
+          <h3 class="card-title">投稿スコア平均値（0〜10）</h3>
+          <p class="card-sub">MART_DROP_JoinAttribute_scored.json の Index_* を投稿単位で平均。スコアが高い順に表示</p>
+          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <div id="score_compare" class="score-list"></div>
+        </div>
+      </section>
+
+      <div class="section-label"><h2>Strategy<span class="note">関係人口創出に向けた示唆</span></h2></div>
+      <section class="card message">
+        <strong>戦略メッセージ</strong>
+        <ul class="insights">
+          <li>イベント施策の主対象は、周遊密度と肯定的評価が高い定住人口。</li>
+          <li>非定住人口には「観光・まち歩き」「歴史・文化・景観」など、既存の観光資産を軸に訴求。</li>
+          <li>次段階では「富山とのゆかり」「職種・専門スキル」「再訪」を取得し、関係人口候補を識別。</li>
+        </ul>
+      </section>
     </section>
 
-    <div class="section-label"><h2>Cross Tab<span class="note">属性 × 定住／非定住</span></h2></div>
-    <section class="grid cross">
-      <div class="card">
-        <h3 class="card-title">年齢層</h3><p class="card-sub">age_group（ユニーク参加者）</p>
-        <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
-        <div id="x_age"></div>
+    <!-- ===================== DROP VIEWER VIEW ===================== -->
+    <section id="view-viewer" class="view">
+      <div class="topbar">
+        <div><h1>DROP Viewer</h1><p>特定のウェルビーイングスコアが高い投稿を一覧で確認</p></div>
+        <div class="status"><span class="pulse"></span>JSON DATA CONNECTED</div>
       </div>
-      <div class="card">
-        <h3 class="card-title">性別</h3><p class="card-sub">gender（ユニーク参加者）</p>
-        <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
-        <div id="x_gender"></div>
+
+      <div class="filters viewer-controls">
+        <label>スコア指標
+          <select id="scoreKey"></select>
+        </label>
+        <label>居住区分
+          <select id="viewerSegment">
+            <option value="all">すべて</option>
+            <option value="定住人口">定住人口</option>
+            <option value="非定住人口">非定住人口</option>
+          </select>
+        </label>
+        <label>表示件数
+          <select id="viewerLimit">
+            <option value="12">上位12件</option>
+            <option value="24" selected>上位24件</option>
+            <option value="48">上位48件</option>
+            <option value="999">すべて（スコア&gt;0）</option>
+          </select>
+        </label>
+        <span class="hint" id="viewerHint"></span>
       </div>
-      <div class="card">
-        <h3 class="card-title">居住地</h3><p class="card-sub">questionnaire_q1（ユニーク参加者）</p>
-        <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
-        <div id="x_residence"></div>
-      </div>
-      <div class="card">
-        <h3 class="card-title">来訪目的</h3><p class="card-sub">questionnaire_q2（ユニーク参加者）</p>
-        <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
-        <div id="x_purpose"></div>
-      </div>
-      <div class="card full">
-        <h3 class="card-title">体験ニーズ</h3><p class="card-sub">questionnaire_q3（複数選択・ユニーク参加者。合計は参加者数を超える場合あり）</p>
-        <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
-        <div id="x_needs"></div>
-      </div>
+
+      <div id="post-grid" class="post-grid"></div>
     </section>
 
-    <div class="section-label"><h2>Strategy<span class="note">関係人口創出に向けた示唆</span></h2></div>
-    <section class="card message">
-      <strong>戦略メッセージ</strong>
-      <ul class="insights">
-        <li>イベント施策の主対象は、周遊密度と肯定的評価が高い定住人口。</li>
-        <li>非定住人口には「観光・まち歩き」「歴史・文化・景観」など、既存の観光資産を軸に訴求。</li>
-        <li>次段階では「富山とのゆかり」「職種・専門スキル」「再訪」を取得し、関係人口候補を識別。</li>
-      </ul>
-    </section>
   </main>
 </div>
-<footer>参照: MART_STAMP_JoinAttribute.json / MART_DROP_JoinAttribute.json ・ 集計は account_id 単位のユニーク参加者数。複数選択項目（questionnaire_q3）はカンマ区切りを展開して集計。</footer>
+<footer>参照: MART_STAMP_JoinAttribute.json / MART_DROP_JoinAttribute_scored.json ・ 集計は account_id 単位のユニーク参加者数。複数選択項目（questionnaire_q3）はカンマ区切りを展開して集計。DROPスコアは Index_* を投稿単位で集計。</footer>
 
 <script>
-const PATHS={stamp:'MART_STAMP_JoinAttribute.json', drop:'MART_DROP_JoinAttribute.json'};
+const PATHS={
+  stamp:'MART_STAMP_JoinAttribute.json',
+  drop:'MART_DROP_JoinAttribute_scored.json'
+};
 let RAW={stamp:[], drop:[]};
 const el=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat('ja-JP').format(n);
+const fmt1=n=>new Intl.NumberFormat('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1}).format(n);
+
+let SCORE_KEYS=[]; // populated once drop data loads
 
 function uniqueByAccount(rows){
   const m=new Map();
@@ -208,7 +290,6 @@ function countBy(rows, key, multi=false){
   return c;
 }
 
-// 定住/非定住 別クロス集計を描画。ラベルの並び順は resident の件数降順。
 function renderCross(elId, residentUsers, visitorUsers, key, multi=false, orderList=null){
   const rc = countBy(residentUsers, key, multi);
   const vc = countBy(visitorUsers, key, multi);
@@ -240,6 +321,29 @@ function renderCross(elId, residentUsers, visitorUsers, key, multi=false, orderL
   }).join('');
 }
 
+function renderScoreCompare(residentPosts, visitorPosts){
+  if(!SCORE_KEYS.length){ el('score_compare').innerHTML='<div class="empty-note">スコアデータがありません</div>'; return; }
+  const rAvg = {}, vAvg = {};
+  SCORE_KEYS.forEach(k=>{
+    const rn = residentPosts.length, vn = visitorPosts.length;
+    rAvg[k] = rn ? residentPosts.reduce((s,p)=> s + (Number(p[k])||0), 0) / rn : 0;
+    vAvg[k] = vn ? visitorPosts.reduce((s,p)=> s + (Number(p[k])||0), 0) / vn : 0;
+  });
+  const sorted = [...SCORE_KEYS].sort((a,b)=> Math.max(rAvg[b],vAvg[b]) - Math.max(rAvg[a],vAvg[a]));
+  const maxVal = Math.max(1, ...SCORE_KEYS.map(k=>Math.max(rAvg[k],vAvg[k])));
+  el('score_compare').innerHTML = sorted.map(k=>{
+    const label = k.replace('Index_','');
+    const rv = rAvg[k], vv = vAvg[k];
+    const rw = Math.max(rv/maxVal*100, rv>0?2:0);
+    const vw = Math.max(vv/maxVal*100, vv>0?2:0);
+    return `<div class="score-row">
+      <div class="sname">${label}</div>
+      <div class="score-side resident"><span class="sval">${fmt1(rv)}</span><div class="strack"><div class="sfill" style="width:${rw}%"></div></div></div>
+      <div class="score-side visitor"><span class="sval">${fmt1(vv)}</span><div class="strack"><div class="sfill" style="width:${vw}%"></div></div></div>
+    </div>`;
+  }).join('');
+}
+
 function render(){
   const ds = el('dataset').value;
   const combinedRaw = ds==='all' ? [...RAW.stamp, ...RAW.drop] : RAW[ds];
@@ -262,19 +366,86 @@ function render(){
   renderCross('x_residence', residentUsers, visitorUsers, 'questionnaire_q1', false);
   renderCross('x_purpose', residentUsers, visitorUsers, 'questionnaire_q2', false);
   renderCross('x_needs', residentUsers, visitorUsers, 'questionnaire_q3', true);
+
+  // score comparison always based on DROP posts (post-level, not deduped by account)
+  const dropAll = RAW.drop;
+  const residentPosts = dropAll.filter(p=>p.residence_segment==='定住人口');
+  const visitorPosts = dropAll.filter(p=>p.residence_segment==='非定住人口');
+  renderScoreCompare(residentPosts, visitorPosts);
 }
 
+/* ===================== DROP Viewer ===================== */
+function populateScoreSelect(){
+  const sel = el('scoreKey');
+  sel.innerHTML = SCORE_KEYS.map(k=>`<option value="${k}">${k.replace('Index_','')}</option>`).join('');
+}
+
+function renderViewer(){
+  const key = el('scoreKey').value;
+  const seg = el('viewerSegment').value;
+  const limit = parseInt(el('viewerLimit').value, 10);
+
+  let posts = RAW.drop.filter(p => Number(p[key]) > 0);
+  if(seg !== 'all') posts = posts.filter(p => p.residence_segment === seg);
+  posts.sort((a,b)=> (Number(b[key])||0) - (Number(a[key])||0));
+
+  el('viewerHint').textContent = `${key.replace('Index_','')} スコア降順 ・ 該当 ${posts.length}件`;
+
+  const shown = posts.slice(0, limit);
+  const grid = el('post-grid');
+  if(!shown.length){ grid.innerHTML = '<div class="empty-note">該当する投稿がありません</div>'; return; }
+
+  grid.innerHTML = shown.map(p=>{
+    const score = Number(p[key])||0;
+    const segClass = p.residence_segment==='定住人口' ? 'resident' : (p.residence_segment==='非定住人口' ? 'visitor' : '');
+    const segLabel = p.residence_segment || '不明';
+    const img = p.image_file_path_thumbnail || p.image_file_path || '';
+    const sentence = (p.sentence || '').replace(/</g,'&lt;');
+    return `<div class="post-card">
+      <img class="thumb" loading="lazy" src="${img}" onerror="this.style.display='none'">
+      <div class="body">
+        <span class="score-badge">${key.replace('Index_','')} ${score}</span>
+        <p class="sentence">${sentence}</p>
+        <div class="meta">
+          <span>${p.account_name||'匿名'}・${p.age_group||'-'}・${p.gender||'-'}</span>
+          <span class="seg-tag ${segClass}">${segLabel}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ===================== Nav switching ===================== */
+document.querySelectorAll('.navi').forEach(nav=>{
+  nav.addEventListener('click', ()=>{
+    document.querySelectorAll('.navi').forEach(n=>n.classList.remove('active'));
+    nav.classList.add('active');
+    const target = nav.getAttribute('data-view');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    el('view-'+target).classList.add('active');
+  });
+});
+
+/* ===================== Load & init ===================== */
 Promise.all(Object.entries(PATHS).map(async([k,p])=>{
   const r = await fetch(p);
   if(!r.ok) throw new Error(p+' を読み込めません（'+r.status+'）');
   RAW[k] = await r.json();
-})).then(render).catch(e=>{
+})).then(()=>{
+  SCORE_KEYS = Object.keys(RAW.drop[0]||{}).filter(k=>k.startsWith('Index_'));
+  populateScoreSelect();
+  render();
+  renderViewer();
+}).catch(e=>{
   const box = el('error');
   box.style.display='block';
   box.textContent = 'JSONの読み込みに失敗しました。HTMLとJSONを同じフォルダーに置き、file:// ではなくローカルサーバー（例: python -m http.server）経由で開いてください。詳細: '+e.message;
 });
 
 el('dataset').addEventListener('change', render);
+el('scoreKey').addEventListener('change', renderViewer);
+el('viewerSegment').addEventListener('change', renderViewer);
+el('viewerLimit').addEventListener('change', renderViewer);
 </script>
 </body>
 </html>
