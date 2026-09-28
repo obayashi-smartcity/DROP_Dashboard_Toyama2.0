@@ -97,17 +97,44 @@ p.card-sub{font-size:11.5px;color:var(--dim);margin:0 0 16px}
 footer{padding:26px 28px 30px;margin-left:var(--sidebar-w);color:var(--dim);font-size:11px;text-align:center;line-height:1.7}
 footer code{color:var(--muted)}
 
-/* Score bars (horizontal double bar per index) */
+/* Score significance ranking (diverging bar per index) */
 .score-list{display:flex;flex-direction:column;gap:0}
-.score-row{display:grid;grid-template-columns:150px 1fr 1fr;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--stroke)}
-.score-row:last-child{border-bottom:0}
-.score-row .sname{font-size:12.5px;font-weight:700;color:var(--text)}
-.score-side{display:flex;align-items:center;gap:8px}
-.score-side .strack{flex:1;height:10px;background:#eef0f3;position:relative}
-.score-side .sfill{height:100%}
-.score-side.resident .sfill{background:var(--attr)}
-.score-side.visitor .sfill{background:var(--rich)}
-.score-side .sval{font-size:11px;color:var(--muted);width:38px;text-align:right;font-variant-numeric:tabular-nums}
+.score-legend{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted);margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--stroke)}
+.score-legend .lg-item{display:flex;align-items:center;gap:7px}
+.score-legend .lg-note{color:var(--dim)}
+.score-legend .lg-note b{color:var(--text)}
+
+.sig-row{display:grid;grid-template-columns:32px 176px 1fr 112px;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--stroke);border-left:3px solid transparent}
+.sig-row:last-child{border-bottom:0}
+.sig-row.sig-strong{border-left-color:#b42318}
+.sig-row.sig-mid{border-left-color:#c99a06}
+.sig-row.sig-weak{border-left-color:var(--stroke)}
+.srank{font-size:15px;font-weight:900;color:var(--dim);text-align:center;font-variant-numeric:tabular-nums}
+.sig-row.sig-strong .srank{color:#b42318}
+.sig-row.sig-mid .srank{color:#c99a06}
+
+.sname-wrap{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sname-wrap .sname{font-size:13px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sig-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;letter-spacing:.2px;width:fit-content;white-space:nowrap}
+.sig-badge.p001{background:#b42318;color:#fff}
+.sig-badge.p01{background:#d1541f;color:#fff}
+.sig-badge.p05{background:#c99a06;color:#fff}
+.sig-badge.ns{background:var(--stroke);color:var(--muted)}
+
+.divergent-wrap{display:flex;flex-direction:column;gap:6px;min-width:0}
+.divergent-track{position:relative;height:14px;background:#eef0f3}
+.divergent-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#c7ccd3}
+.divergent-fill{position:absolute;top:0;bottom:0}
+.divergent-fill.resident{right:50%;background:var(--attr)}
+.divergent-fill.visitor{left:50%;background:var(--rich)}
+.divergent-labels{display:flex;justify-content:space-between;font-size:10.5px;font-variant-numeric:tabular-nums}
+.divergent-labels .lab-resident{color:var(--attr);font-weight:700}
+.divergent-labels .lab-visitor{color:var(--rich);font-weight:700}
+
+.sdiff{font-size:14px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;line-height:1.3}
+.sdiff.resident{color:var(--attr)}
+.sdiff.visitor{color:var(--rich)}
+.sdiff .sdiff-sub{display:block;font-size:9.5px;font-weight:700;color:var(--dim);margin-top:2px}
 
 /* DROP viewer */
 .viewer-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
@@ -122,13 +149,15 @@ footer code{color:var(--muted)}
 .post-card .seg-tag.resident{background:var(--attr-soft);color:var(--attr)}
 .post-card .seg-tag.visitor{background:var(--rich-soft);color:var(--rich)}
 
-@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cross{grid-template-columns:1fr}.score-row{grid-template-columns:120px 1fr 1fr}}
+@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cross{grid-template-columns:1fr}.sig-row{grid-template-columns:26px 140px 1fr 96px;gap:10px}}
 @media (max-width:760px){
   .app{grid-template-columns:1fr} .sidebar{display:none}
   main{padding:16px 14px 40px} footer{margin-left:0;padding:20px 14px 26px}
   .topbar h1{font-size:29px} .section-label h2{font-size:22px}
   .filters{flex-direction:column;align-items:stretch} .filters .hint{margin-left:0}
-  .score-row{grid-template-columns:1fr;gap:6px}
+  .sig-row{grid-template-columns:1fr;gap:6px;padding:14px 0}
+  .srank{display:none}
+  .sdiff{text-align:left}
 }
 @media (max-width:430px){
   .kpis{grid-template-columns:1fr 1fr;gap:10px} .card{padding:14px} .kpi .k-val{font-size:23px}
@@ -204,12 +233,18 @@ footer code{color:var(--muted)}
         </div>
       </section>
 
-      <div class="section-label"><h2>Wellbeing Score<span class="note">DROP投稿スコア（20指標）× 定住／非定住　平均値比較</span></h2></div>
+      <div class="section-label"><h2>Wellbeing Score<span class="note">DROP投稿スコア（20指標）× 定住／非定住　有意差ランキング</span></h2></div>
       <section class="grid">
         <div class="card full">
-          <h3 class="card-title">投稿スコア平均値（0〜10）</h3>
-          <p class="card-sub">MART_DROP_JoinAttribute_scored.json の Index_* を投稿単位で平均。スコアが高い順に表示</p>
-          <div class="legend-top"><span class="li1"><i></i>定住人口</span><span class="li2"><i></i>非定住人口</span></div>
+          <h3 class="card-title">定住人口 と 非定住人口 の有意差（Welchのt検定）</h3>
+          <p class="card-sub">MART_DROP_JoinAttribute_scored.json の Index_* を投稿単位で集計。統計的有意差（p値）が大きい指標ほど上位に表示し、バーは定住−非定住の平均差を中央から左右に可視化</p>
+          <div class="score-legend">
+            <span class="lg-item"><span class="sig-badge p001">p&lt;0.001 ***</span></span>
+            <span class="lg-item"><span class="sig-badge p01">p&lt;0.01 **</span></span>
+            <span class="lg-item"><span class="sig-badge p05">p&lt;0.05 *</span></span>
+            <span class="lg-item"><span class="sig-badge ns">n.s.</span></span>
+            <span class="lg-note">左端の色帯：<b style="color:#b42318">赤=p&lt;0.01</b>　<b style="color:#c99a06">黄=p&lt;0.05</b>　グレー=有意差なし</span>
+          </div>
           <div id="score_compare" class="score-list"></div>
         </div>
       </section>
@@ -321,25 +356,98 @@ function renderCross(elId, residentUsers, visitorUsers, key, multi=false, orderL
   }).join('');
 }
 
+/* ---- Statistics: Welch's t-test (unequal variance) with two-tailed p-value ---- */
+function gammaln(xx){
+  const cof=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let x=xx, y=xx, tmp=x+5.5;
+  tmp -= (x+0.5)*Math.log(tmp);
+  let ser=1.000000000190015;
+  for(let j=0;j<6;j++){ y+=1; ser+=cof[j]/y; }
+  return -tmp+Math.log(2.5066282746310005*ser/x);
+}
+function betacf(a,b,x){
+  const MAXIT=200, EPS=3e-7, FPMIN=1e-30;
+  const qab=a+b, qap=a+1, qam=a-1;
+  let c=1, d=1-qab*x/qap;
+  if(Math.abs(d)<FPMIN) d=FPMIN;
+  d=1/d; let h=d;
+  for(let m=1;m<=MAXIT;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d; const del=d*c; h*=del;
+    if(Math.abs(del-1)<EPS) break;
+  }
+  return h;
+}
+function betai(a,b,x){
+  if(x<=0) return 0;
+  if(x>=1) return 1;
+  const bt=Math.exp(gammaln(a+b)-gammaln(a)-gammaln(b)+a*Math.log(x)+b*Math.log(1-x));
+  return x < (a+1)/(a+b+2) ? bt*betacf(a,b,x)/a : 1-bt*betacf(b,a,1-x)/b;
+}
+function mean(arr){ return arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : 0; }
+function variance(arr,m){ return arr.length>1 ? arr.reduce((s,v)=>s+(v-m)*(v-m),0)/(arr.length-1) : 0; }
+function welchTTest(a,b){
+  const n1=a.length, n2=b.length;
+  if(n1<2||n2<2) return {t:0,df:0,p:1};
+  const m1=mean(a), m2=mean(b), v1=variance(a,m1), v2=variance(b,m2);
+  const se2=v1/n1+v2/n2;
+  if(se2<=0) return {t:0,df:n1+n2-2,p:1};
+  const t=(m1-m2)/Math.sqrt(se2);
+  const df=(se2*se2)/(((v1/n1)*(v1/n1))/(n1-1)+((v2/n2)*(v2/n2))/(n2-1));
+  const p=betai(df/2,0.5,df/(df+t*t));
+  return {t, df, p:Math.min(1,Math.max(0,p))};
+}
+
 function renderScoreCompare(residentPosts, visitorPosts){
   if(!SCORE_KEYS.length){ el('score_compare').innerHTML='<div class="empty-note">スコアデータがありません</div>'; return; }
-  const rAvg = {}, vAvg = {};
-  SCORE_KEYS.forEach(k=>{
-    const rn = residentPosts.length, vn = visitorPosts.length;
-    rAvg[k] = rn ? residentPosts.reduce((s,p)=> s + (Number(p[k])||0), 0) / rn : 0;
-    vAvg[k] = vn ? visitorPosts.reduce((s,p)=> s + (Number(p[k])||0), 0) / vn : 0;
+
+  const stats = SCORE_KEYS.map(k=>{
+    const rArr = residentPosts.map(p=>Number(p[k])||0);
+    const vArr = visitorPosts.map(p=>Number(p[k])||0);
+    const rAvg = mean(rArr), vAvg = mean(vArr);
+    const {p} = welchTTest(rArr, vArr);
+    return {key:k, label:k.replace('Index_',''), rAvg, vAvg, diff:rAvg-vAvg, p};
   });
-  const sorted = [...SCORE_KEYS].sort((a,b)=> Math.max(rAvg[b],vAvg[b]) - Math.max(rAvg[a],vAvg[a]));
-  const maxVal = Math.max(1, ...SCORE_KEYS.map(k=>Math.max(rAvg[k],vAvg[k])));
-  el('score_compare').innerHTML = sorted.map(k=>{
-    const label = k.replace('Index_','');
-    const rv = rAvg[k], vv = vAvg[k];
-    const rw = Math.max(rv/maxVal*100, rv>0?2:0);
-    const vw = Math.max(vv/maxVal*100, vv>0?2:0);
-    return `<div class="score-row">
-      <div class="sname">${label}</div>
-      <div class="score-side resident"><span class="sval">${fmt1(rv)}</span><div class="strack"><div class="sfill" style="width:${rw}%"></div></div></div>
-      <div class="score-side visitor"><span class="sval">${fmt1(vv)}</span><div class="strack"><div class="sfill" style="width:${vw}%"></div></div></div>
+
+  // 有意差(p値)が小さい=差が大きいものを上位に。同点はdiffの絶対値で並べ替え
+  stats.sort((a,b)=> a.p-b.p || Math.abs(b.diff)-Math.abs(a.diff));
+
+  const maxDiff = Math.max(0.01, ...stats.map(s=>Math.abs(s.diff)));
+
+  el('score_compare').innerHTML = stats.map((s,i)=>{
+    let sigClass, badgeClass, badgeLabel;
+    if(s.p < 0.001){ sigClass='sig-strong'; badgeClass='p001'; badgeLabel='p&lt;0.001 ***'; }
+    else if(s.p < 0.01){ sigClass='sig-strong'; badgeClass='p01'; badgeLabel='p&lt;0.01 **'; }
+    else if(s.p < 0.05){ sigClass='sig-mid'; badgeClass='p05'; badgeLabel='p&lt;0.05 *'; }
+    else { sigClass='sig-weak'; badgeClass='ns'; badgeLabel='n.s.'; }
+
+    const side = s.diff >= 0 ? 'resident' : 'visitor';
+    const pct = Math.min(50, Math.abs(s.diff)/maxDiff*50);
+
+    return `<div class="sig-row ${sigClass}">
+      <div class="srank">${i+1}</div>
+      <div class="sname-wrap">
+        <span class="sname">${s.label}</span>
+        <span class="sig-badge ${badgeClass}">${badgeLabel}</span>
+      </div>
+      <div class="divergent-wrap">
+        <div class="divergent-track">
+          <div class="divergent-mid"></div>
+          <div class="divergent-fill ${side}" style="width:${pct}%"></div>
+        </div>
+        <div class="divergent-labels">
+          <span class="lab-resident">定住 ${fmt1(s.rAvg)}</span>
+          <span class="lab-visitor">非定住 ${fmt1(s.vAvg)}</span>
+        </div>
+      </div>
+      <div class="sdiff ${side}">${s.diff>=0?'+':''}${fmt1(s.diff)}<span class="sdiff-sub">${side==='resident'?'定住が高い':'非定住が高い'}</span></div>
     </div>`;
   }).join('');
 }
