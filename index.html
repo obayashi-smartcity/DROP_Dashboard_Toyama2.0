@@ -50,7 +50,7 @@ select{display:block;margin-top:7px;padding:8px 30px 8px 10px;background:#fff;bo
 .section-label .note{font-size:11px;color:var(--dim);font-weight:500}
 
 .grid{display:grid;gap:var(--gap)}
-.kpis{grid-template-columns:repeat(4,1fr)}
+.kpis{grid-template-columns:repeat(3,1fr)}
 .cross{grid-template-columns:1fr 1fr}
 .cross .full{grid-column:1 / -1}
 
@@ -257,7 +257,6 @@ footer code{color:var(--muted)}
         <div class="card kpi"><span class="k-label">総ユニーク参加者数</span><b class="k-val" id="k_total">-</b><span class="k-cap">account_id 重複排除</span></div>
         <div class="card kpi c-attr"><span class="k-label">定住人口</span><b class="k-val" id="k_resident">-</b><span class="k-cap" id="k_resident_pct">-</span></div>
         <div class="card kpi c-acq"><span class="k-label">非定住人口</span><b class="k-val" id="k_visitor">-</b><span class="k-cap" id="k_visitor_pct">-</span></div>
-        <div class="card kpi c-rich"><span class="k-label">まちなか肯定的評価率</span><b class="k-val" id="k_positive">-</b><span class="k-cap">とても＋やや感じている</span></div>
       </section>
 
       <div class="section-label"><h2>Cross Tab<span class="note">属性 × 定住／非定住</span></h2></div>
@@ -559,14 +558,12 @@ function render(){
 
   const residentUsers = users.filter(u=>u.residence_segment==='定住人口');
   const visitorUsers  = users.filter(u=>u.residence_segment==='非定住人口');
-  const positive = users.filter(u=>['とても感じている','やや感じている'].includes(u.questionnaire_q4)).length;
 
   el('k_total').textContent = fmt(users.length);
   el('k_resident').textContent = fmt(residentUsers.length);
   el('k_resident_pct').textContent = users.length ? (residentUsers.length/users.length*100).toFixed(1)+'% を占める' : '-';
   el('k_visitor').textContent = fmt(visitorUsers.length);
   el('k_visitor_pct').textContent = users.length ? (visitorUsers.length/users.length*100).toFixed(1)+'% を占める' : '-';
-  el('k_positive').textContent = users.length ? (positive/users.length*100).toFixed(1)+'%' : '-';
 
   const ageOrder=['10代','20代','30代','40代','50代','60代','70代','80代'];
   renderCross('x_age', residentUsers, visitorUsers, 'age_group', false, ageOrder);
