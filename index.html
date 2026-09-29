@@ -151,6 +151,8 @@ footer code{color:var(--muted)}
 .popup-seg{display:inline-block;font-size:10.5px;font-weight:800;padding:1px 8px;margin-top:4px}
 .popup-seg.resident{background:var(--attr-soft);color:var(--attr)}
 .popup-seg.visitor{background:var(--acq-soft);color:var(--acq)}
+.popup-detail-btn{margin-top:8px;border:0;background:var(--text);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer}
+.popup-detail-btn:hover{background:var(--muted)}
 
 /* Split columns (定住 / 非定住 side-by-side) */
 .split-cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-top:18px}
@@ -174,6 +176,42 @@ footer code{color:var(--muted)}
 .post-card.visitor .score-badge{background:var(--acq)}
 .post-card .sentence{font-size:12px;color:var(--text);line-height:1.5;margin:0;flex:1;min-height:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
 .post-card .meta{font-size:10.5px;color:var(--dim);margin-top:8px;flex:0 0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post-card{cursor:pointer;transition:box-shadow .15s ease,transform .15s ease}
+.post-card:hover{box-shadow:0 4px 16px rgba(31,39,51,.14);transform:translateY(-2px)}
+.post-card .detail-hint{font-size:10px;color:var(--dim);margin-top:6px;flex:0 0 auto;display:flex;align-items:center;gap:4px}
+.post-card:hover .detail-hint{color:var(--text)}
+
+/* DROP detail modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,24,30,.55);z-index:1000;padding:28px 16px;overflow-y:auto}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+.modal-box{background:#fff;max-width:880px;width:100%;margin:auto;max-height:calc(100vh - 56px);overflow-y:auto;border-top:4px solid var(--gray)}
+.modal-box.resident{border-top-color:var(--attr)}
+.modal-box.visitor{border-top-color:var(--acq)}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 22px 0}
+.modal-seg{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;color:#fff}
+.modal-seg.resident{background:var(--attr)}
+.modal-seg.visitor{background:var(--acq)}
+.modal-close{border:0;background:var(--stroke);color:var(--text);font-size:14px;font-weight:800;width:28px;height:28px;line-height:28px;text-align:center;cursor:pointer;flex:0 0 auto;padding:0}
+.modal-close:hover{background:var(--dim);color:#fff}
+.modal-body{padding:16px 22px 26px;display:grid;grid-template-columns:220px 1fr;gap:22px}
+.modal-img{width:100%;height:220px;object-fit:cover;background:#e8ebef;display:block}
+.modal-meta-list{margin-top:12px;font-size:11.5px;color:var(--muted);line-height:1.9}
+.modal-meta-list b{color:var(--text)}
+.modal-sentence{font-size:13.5px;line-height:1.7;color:var(--text);margin:0 0 18px;white-space:pre-wrap}
+.modal-score-title{font-size:12.5px;font-weight:800;color:var(--text);margin:0 0 4px}
+.modal-score-sub{font-size:11px;color:var(--dim);margin:0 0 12px}
+.detail-bars{display:flex;flex-direction:column;gap:8px}
+.detail-bar-row{display:grid;grid-template-columns:112px 1fr 56px;align-items:center;gap:10px}
+.detail-bar-row .db-label{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-bar-row.current .db-label{font-weight:800;color:var(--text)}
+.detail-bar-track{height:10px;background:#eef0f3;position:relative}
+.detail-bar-fill{height:100%;background:var(--dim)}
+.detail-bar-row.resident .detail-bar-fill{background:var(--attr)}
+.detail-bar-row.visitor .detail-bar-fill{background:var(--acq)}
+.detail-bar-row.current.resident .detail-bar-fill{background:var(--attr)}
+.detail-bar-row.current.visitor .detail-bar-fill{background:var(--acq)}
+.detail-bar-row .db-val{font-size:11.5px;font-weight:700;text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
+@media (max-width:640px){.modal-body{grid-template-columns:1fr}.modal-img{height:180px}}
 
 /* STAMP viewer bubble markers */
 .stamp-bubble{display:flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:800;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px rgba(255,255,255,.85);opacity:.88}
@@ -392,6 +430,29 @@ footer code{color:var(--muted)}
 
   </main>
 </div>
+
+<!-- ===================== DROP 詳細モーダル ===================== -->
+<div id="dropDetailModal" class="modal-overlay">
+  <div id="dropDetailBox" class="modal-box">
+    <div class="modal-head">
+      <span id="dropDetailSeg" class="modal-seg"></span>
+      <button type="button" class="modal-close" id="dropDetailClose" aria-label="閉じる">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <img id="dropDetailImg" class="modal-img" loading="lazy">
+        <div id="dropDetailMeta" class="modal-meta-list"></div>
+      </div>
+      <div>
+        <p id="dropDetailSentence" class="modal-sentence"></p>
+        <h4 class="modal-score-title">全指標スコア比較</h4>
+        <p class="modal-score-sub">この投稿の Index_* 全スコアを棒グラフで表示（太字＝一覧で選択中の指標）</p>
+        <div id="dropDetailBars" class="detail-bars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>参照: MART_STAMP_JoinAttribute.json / MART_DROP_JoinAttribute_scored.json ・ 集計は account_id 単位のユニーク参加者数。複数選択項目（questionnaire_q3）はカンマ区切りを展開して集計。DROPスコアは Index_* を投稿単位で集計。</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -585,18 +646,85 @@ function populateScoreSelect(){
   sel.innerHTML = SCORE_KEYS.map(k=>`<option value="${k}">${k.replace('Index_','')}</option>`).join('');
 }
 
-function postCardHtml(p, key, segClass){
+function postCardHtml(p, key, segClass, idx){
   const score = Number(p[key])||0;
   const img = p.image_file_path_thumbnail || p.image_file_path || '';
   const sentence = (p.sentence || '').replace(/</g,'&lt;');
-  return `<div class="post-card ${segClass}">
+  return `<div class="post-card ${segClass}" data-pidx="${idx}" onclick="openDropDetail(${idx})">
     <img class="thumb" loading="lazy" src="${img}" onerror="this.onerror=null;this.style.visibility='hidden'">
     <div class="body">
       <span class="score-badge">${key.replace('Index_','')} ${score}</span>
       <p class="sentence">${sentence}</p>
       <div class="meta">${p.account_name||'匿名'}・${p.age_group||'-'}・${p.gender||'-'}</div>
+      <div class="detail-hint">クリックで詳細を表示 →</div>
     </div>
   </div>`;
+}
+
+/* ---- DROP 詳細モーダル（他インデックスのスコアを棒グラフで表示） ---- */
+let DROP_VIEWER_ITEMS = []; // 現在表示中のカード/マップピンと紐づく投稿一覧
+let GLOBAL_SCORE_MAX = 1;   // 全投稿・全指標の最大値（棒グラフのスケール基準）
+
+function computeGlobalScoreMax(){
+  let max = 1;
+  RAW.drop.forEach(p=>{
+    SCORE_KEYS.forEach(k=>{
+      const v = Number(p[k])||0;
+      if(v > max) max = v;
+    });
+  });
+  GLOBAL_SCORE_MAX = max;
+}
+
+function openDropDetail(idx){
+  const item = DROP_VIEWER_ITEMS[idx];
+  if(!item) return;
+  const { post:p, seg, key } = item;
+  const segLabel = seg==='resident' ? '定住人口' : '非定住人口';
+
+  const box = el('dropDetailBox');
+  box.classList.remove('resident','visitor');
+  box.classList.add(seg);
+
+  const segEl = el('dropDetailSeg');
+  segEl.textContent = segLabel;
+  segEl.className = `modal-seg ${seg}`;
+
+  const img = p.image_file_path_thumbnail || p.image_file_path || '';
+  const imgEl = el('dropDetailImg');
+  imgEl.style.visibility = 'visible';
+  imgEl.onerror = function(){ this.onerror=null; this.style.visibility='hidden'; };
+  imgEl.src = img;
+
+  el('dropDetailMeta').innerHTML = `
+    <div><b>投稿者:</b> ${p.account_name||'匿名'}</div>
+    <div><b>年齢層:</b> ${p.age_group||'-'}</div>
+    <div><b>性別:</b> ${p.gender||'-'}</div>
+    <div><b>属性:</b> ${segLabel}</div>
+    <div><b>${key.replace('Index_','')}スコア:</b> ${Number(p[key])||0}（一覧で選択中の指標）</div>
+  `;
+
+  el('dropDetailSentence').textContent = p.sentence || '(投稿文なし)';
+
+  const rows = SCORE_KEYS.map(k=>({
+    key:k, label:k.replace('Index_',''), val:Number(p[k])||0
+  })).sort((a,b)=> b.val-a.val);
+
+  el('dropDetailBars').innerHTML = rows.map(r=>{
+    const pct = GLOBAL_SCORE_MAX>0 ? Math.min(100, r.val/GLOBAL_SCORE_MAX*100) : 0;
+    const isCurrent = r.key===key;
+    return `<div class="detail-bar-row ${seg}${isCurrent?' current':''}">
+      <span class="db-label">${r.label}</span>
+      <div class="detail-bar-track"><div class="detail-bar-fill" style="width:${pct}%"></div></div>
+      <span class="db-val">${fmt1(r.val)}</span>
+    </div>`;
+  }).join('');
+
+  el('dropDetailModal').classList.add('open');
+}
+
+function closeDropDetail(){
+  el('dropDetailModal').classList.remove('open');
 }
 
 let dropMap=null, dropMarkerLayer=null;
@@ -616,7 +744,7 @@ function updateDropMap(residentPosts, visitorPosts, key){
   const attrColor = getComputedStyle(document.documentElement).getPropertyValue('--attr').trim();
   const acqColor = getComputedStyle(document.documentElement).getPropertyValue('--acq').trim();
 
-  const addPin=(p,color,label)=>{
+  const addPin=(p,color,label,idx)=>{
     if(!p.latitude || !p.longitude) return;
     const score = Number(p[key])||0;
     const marker = L.circleMarker([p.latitude,p.longitude], {
@@ -626,12 +754,13 @@ function updateDropMap(residentPosts, visitorPosts, key){
       `<b>${(p.sentence||'').slice(0,60).replace(/</g,'&lt;')}</b><br>`+
       `${key.replace('Index_','')}スコア: ${score}<br>`+
       `${p.account_name||'匿名'}・${p.age_group||'-'}<br>`+
-      `<span class="popup-seg ${label==='定住人口'?'resident':'visitor'}">${label}</span>`
+      `<span class="popup-seg ${label==='定住人口'?'resident':'visitor'}">${label}</span><br>`+
+      `<button type="button" class="popup-detail-btn" onclick="openDropDetail(${idx})">詳細を見る</button>`
     );
     dropMarkerLayer.addLayer(marker);
   };
-  residentPosts.forEach(p=>addPin(p, attrColor, '定住人口'));
-  visitorPosts.forEach(p=>addPin(p, acqColor, '非定住人口'));
+  residentPosts.forEach((p,i)=>addPin(p, attrColor, '定住人口', i));
+  visitorPosts.forEach((p,i)=>addPin(p, acqColor, '非定住人口', i+residentPosts.length));
 
   const all = [...residentPosts, ...visitorPosts].filter(p=>p.latitude && p.longitude);
   if(all.length){
@@ -656,9 +785,15 @@ function renderDropViewer(){
   el('resCount').textContent = `該当 ${residentAll.length}件中 ${residentShown.length}件表示`;
   el('visCount').textContent = `該当 ${visitorAll.length}件中 ${visitorShown.length}件表示`;
 
+  // 詳細モーダル／マップピンから参照できるよう、表示中の投稿を通し番号で登録（定住→非定住の順）
+  DROP_VIEWER_ITEMS = [
+    ...residentShown.map(p=>({post:p, seg:'resident', key})),
+    ...visitorShown.map(p=>({post:p, seg:'visitor', key}))
+  ];
+
   const rGrid = el('post-grid-resident'), vGrid = el('post-grid-visitor');
-  rGrid.innerHTML = residentShown.length ? residentShown.map(p=>postCardHtml(p,key,'resident')).join('') : '<div class="empty-note">該当する投稿がありません</div>';
-  vGrid.innerHTML = visitorShown.length ? visitorShown.map(p=>postCardHtml(p,key,'visitor')).join('') : '<div class="empty-note">該当する投稿がありません</div>';
+  rGrid.innerHTML = residentShown.length ? residentShown.map((p,i)=>postCardHtml(p,key,'resident', i)).join('') : '<div class="empty-note">該当する投稿がありません</div>';
+  vGrid.innerHTML = visitorShown.length ? visitorShown.map((p,i)=>postCardHtml(p,key,'visitor', i+residentShown.length)).join('') : '<div class="empty-note">該当する投稿がありません</div>';
 
   updateDropMap(residentShown, visitorShown, key);
 }
@@ -789,6 +924,7 @@ Promise.all(Object.entries(PATHS).map(async([k,p])=>{
   RAW[k] = await r.json();
 })).then(()=>{
   SCORE_KEYS = Object.keys(RAW.drop[0]||{}).filter(k=>k.startsWith('Index_'));
+  computeGlobalScoreMax();
   populateScoreSelect();
   render();
 }).catch(e=>{
@@ -800,6 +936,11 @@ Promise.all(Object.entries(PATHS).map(async([k,p])=>{
 el('dataset').addEventListener('change', render);
 el('scoreKey').addEventListener('change', renderDropViewer);
 el('viewerLimit').addEventListener('change', renderDropViewer);
+
+/* DROP 詳細モーダルの開閉制御 */
+el('dropDetailClose').addEventListener('click', closeDropDetail);
+el('dropDetailModal').addEventListener('click', (e)=>{ if(e.target.id==='dropDetailModal') closeDropDetail(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDropDetail(); });
 </script>
 </body>
 </html>
